@@ -1,0 +1,2 @@
+#validate haproxy file for errors
+haproxy -c -f /etc/haproxy/haproxy.cfg
