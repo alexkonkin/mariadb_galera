@@ -32,9 +32,6 @@ global
     group haproxy
 
 
-systemctl stop haproxy
-systemctl stop keepalived
-
 defaults
     log     global
     option  dontlognull
