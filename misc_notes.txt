@@ -1,2 +1,7 @@
 #validate haproxy file for errors
 haproxy -c -f /etc/haproxy/haproxy.cfg
+
+#high rate of health checks for MariaDB blocks the haproxy IP in MariaDB
+#to unblock it the command below should be executed on one of MariaDB servers
+mysqladmin flush-hosts
+
