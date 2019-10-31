@@ -46,7 +46,7 @@ defaults
 
 
 frontend http
-    bind *:80
+    bind 192.168.1.100:80
     mode http
     option httplog
     default_backend webservers
