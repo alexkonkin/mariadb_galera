@@ -9,8 +9,9 @@ $install_mysql_cluster1 = <<-SCRIPT
   echo $nod_ip
   echo $is_first_node
 
-  sed -i 's/nm/'$nod_nam'/g' /etc/mysql/conf.d/galera.cnf
-  sed -i 's/node_ip/'$nod_ip'/g' /etc/mysql/conf.d/galera.cnf
+  echo "Substitution with sed..."
+  sed -i 's/bind-address\t\t= 127.0.0.1/#bind-address\t\t= 127.0.0.1\\nskip-bind-address\\nskip-networking=0\\n/g' /etc/mysql/my.cnf
+  echo $?
 SCRIPT
 
 $install_keepalived_haproxy = <<-SCRIPT
@@ -167,7 +168,7 @@ END
   fi
 
   #allow MariaDb to listen on network interface instead of localhost
-  sed -i 's/bind-address\t\t= 127.0.0.1/#bind-address\t\t= 127.0.0.1\nskip-bind-address\nskip-networking=0\n/g' /etc/mysql/my.cnf
+  sed -i 's/bind-address\t\t= 127.0.0.1/#bind-address\t\t= 127.0.0.1\\nskip-bind-address\\nskip-networking=0\\n/g' /etc/mysql/my.cnf
 
   sudo systemctl start mysql
 
