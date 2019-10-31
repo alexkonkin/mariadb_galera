@@ -112,7 +112,7 @@ sed -i 's/THIS_IP/'$this_ip'/g' /etc/keepalived/keepalived.conf
 sed -i 's/PEER_IP/'$peer_ip'/g' /etc/keepalived/keepalived.conf
 
 systemctl start keepalived
-systemctl start haproxy
+systemctl restart haproxy
 
 SCRIPT
 
