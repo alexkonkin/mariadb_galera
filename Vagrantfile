@@ -75,6 +75,7 @@ backend dbservers
     mode tcp
     balance leastconn
     option tcpka
+    option mysql-check user haproxy_user post-41
     server mysql-node1 172.16.94.11:3306 check weight 1
     server mysql-node2 172.16.94.12:3306 check weight 1
     server mysql-node3 172.16.94.13:3306 check weight 1
@@ -164,7 +165,10 @@ END
   sudo systemctl stop mysql
 
   if [ $is_first_node == true ];then
+    #setup new cluster
     sudo galera_new_cluster
+    #set cron job that unblocks connectons to cluster that is a matter of extensive haproxy checks
+    (crontab -l 2>/dev/null; echo "* * * * * /usr/bin/mysqladmin flush-hosts") | crontab -
   fi
 
   #allow MariaDb to listen on network interface instead of localhost
@@ -172,9 +176,14 @@ END
 
   sudo systemctl start mysql
 
-  #enable connections from the network with haproxy instances
-  mysql -u root --password=123456 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'192.168.1.%' IDENTIFIED BY '123456' WITH GRANT OPTION;"
-  mysql -u root --password=123456 -e "FLUSH PRIVILEGES;"
+  #this is a cluster, so we need to run these commands only once
+  if [ $is_first_node == true ];then
+    #enable connections from the network with haproxy instances
+    mysql -u root --password=123456 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;FLUSH PRIVILEGES;"
+
+    #add account for haproxy monitoring
+    mysql -u root --password=123456 -e "CREATE USER 'haproxy_user'@'%';GRANT ALL PRIVILEGES ON *.* TO 'haproxy_user'@'%';FLUSH PRIVILEGES;"
+  fi
 
   mysql -u root --password=123456 -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
 SCRIPT
